@@ -1,0 +1,35 @@
+general:
+  artifacts:
+    - "./ClarityMoney.app"
+  build_dir: ClarityMoney
+
+notify:
+  webhooks:
+    # A list of hook hashes, containing the URL field
+    #- url: https://hooks.slack.com/services/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
+
+machine:
+  xcode:
+    version: "8.2.1"
+  environment:
+    XCODE_SCHEME: "Clarity - Dev"
+  pre:
+    - sudo gem cleanup
+    - yes | sudo gem uninstall cocoapods
+    - sudo gem install cocoapods -v 1.2.0
+    - brew install swiftlint
+
+dependencies:
+  pre:
+    - pip install -U selenium
+    - npm install -g appium
+
+test:
+  pre:
+    - git clone https://github.com/claritymoney/cm-automation.git
+    - appium:
+        background: true
+    - xcrun instruments -w "iPhone 7 (10.3) [" || true
+
+  override:
+    - python ios-automation/smoke/TestSuite.py
